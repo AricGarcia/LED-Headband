@@ -14,32 +14,45 @@ LP5562::LP5562(int address)
   _writeI2C(int reg = 0x08, int data = 0x21);
 }
 
-void LP5562::SetDirectPwm()
+/* Set PWM direct input from AVR from 0-255 duty cycle. Color is as follows:
+   blue:  0
+   green: 1
+   red:   2
+   white: 3
+   */
+void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
 {
-
-  int bit0_loc;
-  int bit1_loc;
+  int current_state = readI2C(_LED_MAP, 1);
+  uint8_t bit0_loc;
+  uint8_t bit1_loc;
   switch (color)
   {
     case 0:
       bit0_loc = 0;
       bit1_loc = 1;
+      writeI2C(_B_PWM, pwm, 1);
       break;
     case 1:
       bit0_loc = 2;
       bit1_loc = 3;
+      writeI2C(_G_PWM, pwm, 1);
       break;
     case 2:
       bit0_loc = 4;
       bit1_loc = 5;
+      writeI2C(_R_PWM, pwm, 1);
       break;
     case 3:
       bit0_loc = 6;
       bit1_loc = 7;
+      writeI2C(_W_PWM, pwm, 1);
       break;
     default:
       return 0;
   }
+  current_state ^= (-0 ^ current_state) & (1UL << bit0_loc);
+  current_state ^= (-0 ^ current_state) & (1UL << bit1_loc);
+  writeI2C(_LED_MAP, current_state, 1);
 }
 
 /* Send up to two bytes at a time. cmd_reg is register to begin writing to. LP5562 supports 

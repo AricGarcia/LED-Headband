@@ -7,7 +7,7 @@ class LP5562
   public:
     // Public LP5562 functions/variables
     LP5562(int address);
-    void setPWM();
+    void setDirectPWM(uint8_t pwm, uint8_t color);
     void setPC();
     void programEngine();
     void startEngine();
@@ -20,8 +20,8 @@ class LP5562
     void _startCondition();
     void _sendData(int reg);
     void _endCondition();
-    uint8_t _writeI2C(int reg, int data);
-    uint8_t _readI2C();
+    uint8_t _writeI2C(uint8_t cmd_reg, uint16_t data, uint8_t num_bytes);
+    int _readI2C(uint8_t cmd_reg, uint8_t num_bytes);
     
     // Private LP5562 functions/variables
     void _enablePowerSave();
