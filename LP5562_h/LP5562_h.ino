@@ -10,9 +10,15 @@ class LP5562
     void setDirectPWM(uint8_t pwm, uint8_t color);
     void setPC();
     void programEngine();
-    void startEngine();
     void executeEngine();
     void deviceReset();
+    uint16_t rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t increment);
+    int waitCMD(uint8_t prescale, uint8_t steptime);
+    int setPwmCMD(uint8_t pwm);
+    int goToStartCMD();
+    int branchCMD(uint8_t loop_cnt, uint8_t step_num);
+    int endCMD(uint8_t send_interupt, uint8_t reset);
+    int triggerCMD(uint8_t send_trigger, uint8_t wait_trigger);
   private:
     // I2C functions/variables
     uint8_t _address;
@@ -21,7 +27,7 @@ class LP5562
     void _sendData(int reg);
     void _endCondition();
     uint8_t _writeI2C(uint8_t cmd_reg, uint16_t data, uint8_t num_bytes);
-    int _readI2C(uint8_t cmd_reg, uint8_t num_bytes);
+    uint16_t _readI2C(uint8_t cmd_reg, uint8_t num_bytes);
     
     // Private LP5562 functions/variables
     void _enablePowerSave();
@@ -46,22 +52,8 @@ class LP5562
     uint8_t _W_CURRENT = 0x0F;
     uint8_t _LED_MAP = 0x70;
     //ENG1
-    uint8_t _PROG_MEM_ENG1_CMD1 = 0x10;
-    uint8_t _PROG_MEM_ENG1_CMD2 = 0x12;
-    uint8_t _PROG_MEM_ENG1_CMD3 = 0x14;
-    uint8_t _PROG_MEM_ENG1_CMD4 = 0x16;
-    uint8_t _PROG_MEM_ENG1_CMD5 = 0x18;
-    uint8_t _PROG_MEM_ENG1_CMD6 = 0x1A;
-    uint8_t _PROG_MEM_ENG1_CMD7 = 0x1C;
-    uint8_t _PROG_MEM_ENG1_CMD8 = 0x1E;
-    uint8_t _PROG_MEM_ENG1_CMD9 = 0x20;
-    uint8_t _PROG_MEM_ENG1_CMD10 = 0x22;
-    uint8_t _PROG_MEM_ENG1_CMD11 = 0x24;
-    uint8_t _PROG_MEM_ENG1_CMD12 = 0x26;
-    uint8_t _PROG_MEM_ENG1_CMD13 = 0x28;
-    uint8_t _PROG_MEM_ENG1_CMD14 = 0x2A;
-    uint8_t _PROG_MEM_ENG1_CMD15 = 0x2C;
-    uint8_t _PROG_MEM_ENG1_CMD16 = 0x2E;
+    uint16_t _ENG1[16] = [{0x10, 0x12, 0x14, 0x16, 0x18, 0x1A, 0x1C, 0x1E, 
+    0x20, 0x22, 0x24, 0x26, 0x28, 0x2A, 0x2C, 0x2E}
     //ENG2
     uint8_t _PROG_MEM_ENG2_CMD1 = 0x30;
     uint8_t _PROG_MEM_ENG2_CMD2 = 0x32;
