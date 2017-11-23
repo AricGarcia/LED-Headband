@@ -52,42 +52,17 @@ class LP5562
     uint8_t _W_CURRENT = 0x0F;
     uint8_t _LED_MAP = 0x70;
     //ENG1
-    uint16_t _ENG1[16] = [{0x10, 0x12, 0x14, 0x16, 0x18, 0x1A, 0x1C, 0x1E, 
-    0x20, 0x22, 0x24, 0x26, 0x28, 0x2A, 0x2C, 0x2E}
+    uint16_t _ENG1[16] = {0x10, 0x12, 0x14, 0x16, 0x18, 0x1A, 0x1C, 0x1E, 
+    0x20, 0x22, 0x24, 0x26, 0x28, 0x2A, 0x2C, 0x2E};
     //ENG2
-    uint8_t _PROG_MEM_ENG2_CMD1 = 0x30;
-    uint8_t _PROG_MEM_ENG2_CMD2 = 0x32;
-    uint8_t _PROG_MEM_ENG2_CMD3 = 0x34;
-    uint8_t _PROG_MEM_ENG2_CMD4 = 0x36;
-    uint8_t _PROG_MEM_ENG2_CMD5 = 0x38;
-    uint8_t _PROG_MEM_ENG2_CMD6 = 0x3A;
-    uint8_t _PROG_MEM_ENG2_CMD7 = 0x3C;
-    uint8_t _PROG_MEM_ENG2_CMD8 = 0x3E;
-    uint8_t _PROG_MEM_ENG2_CMD9 = 0x40;
-    uint8_t _PROG_MEM_ENG2_CMD10 = 0x42;
-    uint8_t _PROG_MEM_ENG2_CMD11 = 0x44;
-    uint8_t _PROG_MEM_ENG2_CMD12 = 0x46;
-    uint8_t _PROG_MEM_ENG2_CMD13 = 0x48;
-    uint8_t _PROG_MEM_ENG2_CMD14 = 0x4A;
-    uint8_t _PROG_MEM_ENG2_CMD15 = 0x4C;
-    uint8_t _PROG_MEM_ENG2_CMD16 = 0x4E;
+    uint16_t _ENG2[16] = {0x30, 0x32, 0x34, 0x36, 0x38, 0x3A, 0x3C, 0x3E, 
+    0x40, 0x42, 0x44, 0x46, 0x48, 0x4A, 0x4C, 0x4E};
     //ENG3
-    uint8_t _PROG_MEM_ENG3_CMD1 = 0x50;
-    uint8_t _PROG_MEM_ENG3_CMD2 = 0x52;
-    uint8_t _PROG_MEM_ENG3_CMD3 = 0x54;
-    uint8_t _PROG_MEM_ENG3_CMD4 = 0x56;
-    uint8_t _PROG_MEM_ENG3_CMD5 = 0x58;
-    uint8_t _PROG_MEM_ENG3_CMD6 = 0x5A;
-    uint8_t _PROG_MEM_ENG3_CMD7 = 0x5C;
-    uint8_t _PROG_MEM_ENG3_CMD8 = 0x5E;
-    uint8_t _PROG_MEM_ENG3_CMD9 = 0x60;
-    uint8_t _PROG_MEM_ENG3_CMD10 = 0x62;
-    uint8_t _PROG_MEM_ENG3_CMD11 = 0x64;
-    uint8_t _PROG_MEM_ENG3_CMD12 = 0x66;
-    uint8_t _PROG_MEM_ENG3_CMD13 = 0x68;
-    uint8_t _PROG_MEM_ENG3_CMD14 = 0x6A;
-    uint8_t _PROG_MEM_ENG3_CMD15 = 0x6C;
-    uint8_t _PROG_MEM_ENG3_CMD16 = 0x6E;
+    uint16_t _ENG3[16] = {0x50, 0x52, 0x54, 0x56, 0x58, 0x5A, 0x5C, 0x5E,
+    0x60, 0x62, 0x64, 0x66, 0x68, 0x6A, 0x6C, 0x6E};
+    int Engine1 = _ENG1*;
+    int Engine2 = _ENG2*;
+    int Engine3 = _ENG3*;
     
 }
 
