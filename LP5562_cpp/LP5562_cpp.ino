@@ -57,11 +57,29 @@ void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
   writeI2C(_LED_MAP, current_state, 1);
 }
 
-void LP5562::programEngine()
+void LP5562::programEngine(uint8_t eng, uint16_t* program)
 {
   disablePowerSave();
-  
-  disablePowerSave();
+  switch (eng)
+  {
+    case 0:
+      uint16_t engine = _ENG1;
+      break;
+    case 1:
+      uint16_t engine = _ENG2;
+      break;
+    case 2:
+      uint16_t engine = _ENG3;
+      break;
+    default:
+      return 0;
+  }
+  for(uint8_t i=0; i<=15; i++)
+  {
+    writeI2C(engine[i], *program, 2);
+    program++;
+  }
+  enablePowerSave();
 }
 
 
@@ -176,3 +194,54 @@ uint16_t LP5563::readI2C(uint8_t cmd_reg, uint8_t num_bytes)
     received += TinyWireM.receive();
   }
 }
+
+/*
+
+#include <iostream>
+
+using namespace std;
+
+uint16_t rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t increment)
+{
+  uint16_t command = 0;
+  command |= prescale << 14;
+  command |= steptime << 8;
+  command |= sign << 7;
+  command |= increment;
+  return command;
+}
+
+
+uint16_t waitCMD(uint8_t prescale, uint8_t steptime)
+{
+  uint16_t command = 0;
+  command |= prescale << 14;
+  command |= steptime << 8;
+  return command;
+}
+
+
+uint16_t setPwmCMD(uint8_t pwm)
+{
+  uint16_t command = 0x4000;
+  command |= pwm;
+  return command;
+}
+
+
+int main()
+{
+    uint16_t program[5] = {rampCMD(1, 42, 1, 85), 
+    waitCMD(1, 42), 
+    setPwmCMD(160), 
+    rampCMD(1, 42, 0, 85), 
+    waitCMD(0, 42)};
+    
+    for(int i = 0; i<=4; i++)
+    {
+        cout<<program[i]<<endl;
+    }
+    return 0;
+}
+
+*/

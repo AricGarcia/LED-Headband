@@ -9,16 +9,16 @@ class LP5562
     LP5562(int address);
     void setDirectPWM(uint8_t pwm, uint8_t color);
     void setPC();
-    void programEngine();
+    void programEngine(uint8_t eng, uint16_t* program);
     void executeEngine();
     void deviceReset();
     uint16_t rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t increment);
-    int waitCMD(uint8_t prescale, uint8_t steptime);
-    int setPwmCMD(uint8_t pwm);
-    int goToStartCMD();
-    int branchCMD(uint8_t loop_cnt, uint8_t step_num);
-    int endCMD(uint8_t send_interupt, uint8_t reset);
-    int triggerCMD(uint8_t send_trigger, uint8_t wait_trigger);
+    uint16_t waitCMD(uint8_t prescale, uint8_t steptime);
+    uint16_t setPwmCMD(uint8_t pwm);
+    uint16_t goToStartCMD();
+    uint16_t branchCMD(uint8_t loop_cnt, uint8_t step_num);
+    uint16_t endCMD(uint8_t send_interupt, uint8_t reset);
+    uint16_t triggerCMD(uint8_t send_trigger, uint8_t wait_trigger);
   private:
     // I2C functions/variables
     uint8_t _address;
@@ -60,10 +60,6 @@ class LP5562
     //ENG3
     uint16_t _ENG3[16] = {0x50, 0x52, 0x54, 0x56, 0x58, 0x5A, 0x5C, 0x5E,
     0x60, 0x62, 0x64, 0x66, 0x68, 0x6A, 0x6C, 0x6E};
-    int Engine1 = _ENG1*;
-    int Engine2 = _ENG2*;
-    int Engine3 = _ENG3*;
-    
 }
 
 #endif
