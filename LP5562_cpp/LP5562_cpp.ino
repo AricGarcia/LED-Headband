@@ -24,7 +24,7 @@ LP5562::LP5562(int address)
    */
 void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
 {
-  int current_state = readI2C(_LED_MAP, 1);
+  uint16_t current_state = readI2C(_LED_MAP, 1);
   uint8_t bit0_loc;
   uint8_t bit1_loc;
   switch (color)
@@ -57,23 +57,39 @@ void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
   writeI2C(_LED_MAP, current_state, 1);
 }
 
+
+/*  
+ *   programEngine takes an input of eng from [0:2] which corresponds to 
+ *  [ENG3:ENG1]. program is defined as the pointer of the first command 
+ *  to be programmed to the engine.
+*/
 void LP5562::programEngine(uint8_t eng, uint16_t* program)
 {
   disablePowerSave();
+  uint16_t current_state = readI2C(_OP_MODE, 1);
   switch (eng)
   {
     case 0:
       uint16_t engine = _ENG1;
+      bit0_loc = 4;
+      bit1_loc = 5;
       break;
     case 1:
       uint16_t engine = _ENG2;
+      bit0_loc = 2;
+      bit1_loc = 3;
       break;
     case 2:
       uint16_t engine = _ENG3;
+      bit0_loc = 0;
+      bit1_loc = 1;
       break;
     default:
       return 0;
   }
+  current_state ^= (-1 ^ current_state) & (1UL << bit0_loc);
+  current_state ^= (-0 ^ current_state) & (1UL << bit1_loc);
+  writeI2C(_OP_MODE, current_state, 1);
   for(uint8_t i=0; i<=15; i++)
   {
     writeI2C(engine[i], *program, 2);
@@ -157,11 +173,13 @@ int LP5562::triggerCMD(uint8_t send_trigger, uint8_t wait_trigger)
 }
 
 
-/* Send up to two bytes at a time. cmd_reg is register to begin writing to. LP5562 supports 
-   auto register increment so if sending 2 bytes it will auto increment to the next 
-   reg in line (good for writing to engine command regs). num_bytes ensures that you 
-   can send a 0 byte before a non 0 byte. It should only be commanded to be 1 or 2, 
-   no more and no less. */
+/* 
+ *  Send up to two bytes at a time. cmd_reg is register to begin writing to. LP5562 supports 
+ *  auto register increment so if sending 2 bytes it will auto increment to the next 
+ *  reg in line (good for writing to engine command regs). num_bytes ensures that you 
+ *  can send a 0 byte before a non 0 byte. It should only be commanded to be 1 or 2, 
+ *  no more and no less. 
+ */
 uint8_t LP5562::writeI2C(uint8_t cmd_reg, uint16_t data, uint8_t num_bytes)
 {
   TinyWireM.beginTransmission(_address);
@@ -180,7 +198,8 @@ uint8_t LP5562::writeI2C(uint8_t cmd_reg, uint16_t data, uint8_t num_bytes)
 }
 
 /* Read up to 2 bytes. cmd_reg is the register where you want to begin reading from. 
-   nbytes is how many bytes you want from it.*/
+ *  nbytes is how many bytes you want from it.
+ */
 uint16_t LP5563::readI2C(uint8_t cmd_reg, uint8_t num_bytes)
 {
   uint16_t received = 0;
