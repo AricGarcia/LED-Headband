@@ -10,7 +10,7 @@ class LP5562
     void setDirectPWM(uint8_t pwm, uint8_t color);
     void setPC();
     void programEngine(uint8_t eng, uint16_t* program);
-    void executeEngine();
+    void executeEngine(uint8_t eng);
     void deviceReset();
     uint16_t rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t increment);
     uint16_t waitCMD(uint8_t prescale, uint8_t steptime);
@@ -22,17 +22,13 @@ class LP5562
   private:
     // I2C functions/variables
     uint8_t _address;
-    int dataRate = 8;
-    void _startCondition();
-    void _sendData(int reg);
-    void _endCondition();
     uint8_t _writeI2C(uint8_t cmd_reg, uint16_t data, uint8_t num_bytes);
     uint16_t _readI2C(uint8_t cmd_reg, uint8_t num_bytes);
+    void _safeSet2Bits(uint8_t reg, uint8_t bit1, uint8_t bit0, uint8_t bit1_loc, uint8_t bit0_loc);
     
     // Private LP5562 functions/variables
     void _enablePowerSave();
     void _disablePowerSave();
-    void _setLEDMap(int mode, int color);
 
     uint8_t _ENABLE = 0x00;
     uint8_t _OP_MODE = 0x01;

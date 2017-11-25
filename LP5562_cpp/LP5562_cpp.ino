@@ -24,7 +24,6 @@ LP5562::LP5562(int address)
    */
 void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
 {
-  uint16_t current_state = readI2C(_LED_MAP, 1);
   uint8_t bit0_loc;
   uint8_t bit1_loc;
   switch (color)
@@ -52,9 +51,7 @@ void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
     default:
       return 0;
   }
-  current_state ^= (-0 ^ current_state) & (1UL << bit0_loc);
-  current_state ^= (-0 ^ current_state) & (1UL << bit1_loc);
-  writeI2C(_LED_MAP, current_state, 1);
+  safeSet2Bits(_LED_MAP, 0, 0, bit1_loc, bit0_loc)
 }
 
 
@@ -69,17 +66,17 @@ void LP5562::programEngine(uint8_t eng, uint16_t* program)
   switch (eng)
   {
     case 0:
-      uint16_t engine = _ENG1;
+      uint16_t* engine = _ENG1;
       bit0_loc = 4;
       bit1_loc = 5;
       break;
     case 1:
-      uint16_t engine = _ENG2;
+      uint16_t* engine = _ENG2;
       bit0_loc = 2;
       bit1_loc = 3;
       break;
     case 2:
-      uint16_t engine = _ENG3;
+      uint16_t* engine = _ENG3;
       bit0_loc = 0;
       bit1_loc = 1;
       break;
@@ -128,21 +125,32 @@ void LP5562:executeEngine(uint8_t eng)
     default:
       return 0;
   }
-  // Read current state of mode and enable regs
-  uint16_t mode_current_state = readI2C(_OP_MODE, 1);
-  uint16_t enable_current_state = readI2C(_ENABLE, 1);
   // Set mode to run
-  mode_current_state ^= (-0 ^ mode_current_state) & (1UL << bit0_loc);
-  mode_current_state ^= (-1 ^ mode_current_state) & (1UL << bit1_loc);
-  writeI2C(_OP_MODE, mode_current_state, 1);
+  safeSet2Bits(_OP_MODE, 1, 0, bit1_loc, bit0_loc);
   // Set enable to run
-  enable_current_state ^= (-0 ^ enable_current_state) & (1UL << bit0_loc);
-  enable_current_state ^= (-1 ^ enable_current_state) & (1UL << bit1_loc);
-  writeI2C(_ENABLE, enable_current_state, 1);
+  safeSet2Bits(_ENABLE, 1, 0, bit1_loc, bit0_loc);
 }
 
 
-void setPC()
+void LP5562::setPC()
+{
+  
+}
+
+
+void LP5562::deviceReset()
+{
+  
+}
+
+
+void LP5562::enablePowerSave()
+{
+  
+}
+
+
+void LP5562::disbalePowerSave()
 {
   
 }
