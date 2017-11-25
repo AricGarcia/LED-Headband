@@ -65,8 +65,7 @@ void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
 */
 void LP5562::programEngine(uint8_t eng, uint16_t* program)
 {
-  disablePowerSave();
-  uint16_t current_state = readI2C(_OP_MODE, 1);
+  // Set const values for loading to appropriate engine
   switch (eng)
   {
     case 0:
@@ -87,21 +86,59 @@ void LP5562::programEngine(uint8_t eng, uint16_t* program)
     default:
       return 0;
   }
+  // Disable power save mode
+  disablePowerSave();
+  // Find current state of mode register
+  uint16_t current_state = readI2C(_OP_MODE, 1);
+  // Enforce load program mode to mode register
   current_state ^= (-1 ^ current_state) & (1UL << bit0_loc);
   current_state ^= (-0 ^ current_state) & (1UL << bit1_loc);
   writeI2C(_OP_MODE, current_state, 1);
+  // Write program
   for(uint8_t i=0; i<=15; i++)
   {
     writeI2C(engine[i], *program, 2);
     program++;
   }
+  // Enforce disabled mode to mode register
+  current_state ^= (-0 ^ current_state) & (1UL << bit0_loc);
+  current_state ^= (-0 ^ current_state) & (1UL << bit1_loc);
+  writeI2C(_OP_MODE, current_state, 1);
+  // Renable power save mode
   enablePowerSave();
 }
 
 
-void LP5562:executeEngine()
+void LP5562:executeEngine(uint8_t eng)
 {
-  
+  switch (eng)
+  {
+    case 0:
+      bit0_loc = 4;
+      bit1_loc = 5;
+      break;
+    case 1:
+      bit0_loc = 2;
+      bit1_loc = 3;
+      break;
+    case 2:
+      bit0_loc = 0;
+      bit1_loc = 1;
+      break;
+    default:
+      return 0;
+  }
+  // Read current state of mode and enable regs
+  uint16_t mode_current_state = readI2C(_OP_MODE, 1);
+  uint16_t enable_current_state = readI2C(_ENABLE, 1);
+  // Set mode to run
+  mode_current_state ^= (-0 ^ mode_current_state) & (1UL << bit0_loc);
+  mode_current_state ^= (-1 ^ mode_current_state) & (1UL << bit1_loc);
+  writeI2C(_OP_MODE, mode_current_state, 1);
+  // Set enable to run
+  enable_current_state ^= (-0 ^ enable_current_state) & (1UL << bit0_loc);
+  enable_current_state ^= (-1 ^ enable_current_state) & (1UL << bit1_loc);
+  writeI2C(_ENABLE, enable_current_state, 1);
 }
 
 
@@ -200,7 +237,7 @@ uint8_t LP5562::writeI2C(uint8_t cmd_reg, uint16_t data, uint8_t num_bytes)
 /* Read up to 2 bytes. cmd_reg is the register where you want to begin reading from. 
  *  nbytes is how many bytes you want from it.
  */
-uint16_t LP5563::readI2C(uint8_t cmd_reg, uint8_t num_bytes)
+uint16_t LP5562::readI2C(uint8_t cmd_reg, uint8_t num_bytes)
 {
   uint16_t received = 0;
   TinyWireM.beginTransmission(_address);
@@ -212,6 +249,15 @@ uint16_t LP5563::readI2C(uint8_t cmd_reg, uint8_t num_bytes)
     received = received << 8;
     received += TinyWireM.receive();
   }
+}
+
+
+void LP5562::safeSet2Bits(uint8_t reg, uint8_t bit1, uint8_t bit0, uint8_t bit1_loc, uint8_t bit0_loc)
+{
+  uint16_t current_state = readI2C(reg, 1);
+  current_state ^= (-bit0 ^ current_state) & (1UL << bit0_loc);
+  current_state ^= (-bit1 ^ current_state) & (1UL << bit1_loc);
+  writeI2C(reg, current_state, 1);
 }
 
 /*
