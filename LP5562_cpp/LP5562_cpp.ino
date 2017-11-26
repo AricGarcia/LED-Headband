@@ -10,9 +10,9 @@ LP5562::LP5562(int address)
   _address = address;
   TinyWireM.begin();
   wait(1);
-  _writeI2C(int reg = 0x00, int data = 0x40);
+  writeI2C(_ENABLE, 0x40, 1);
   wait(1);
-  _writeI2C(int reg = 0x08, int data = 0x21);
+  writeI2C(_CONFIG, 0x21, 1);
 }
 
 
@@ -24,34 +24,32 @@ LP5562::LP5562(int address)
    */
 void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
 {
-  uint8_t bit0_loc;
-  uint8_t bit1_loc;
   switch (color)
   {
     case 0:
-      bit0_loc = 0;
-      bit1_loc = 1;
+      uint8_t bit0_loc = 0;
+      uint8_t bit1_loc = 1;
       writeI2C(_B_PWM, pwm, 1);
       break;
     case 1:
-      bit0_loc = 2;
-      bit1_loc = 3;
+      uint8_t bit0_loc = 2;
+      uint8_t bit1_loc = 3;
       writeI2C(_G_PWM, pwm, 1);
       break;
     case 2:
-      bit0_loc = 4;
-      bit1_loc = 5;
+      uint8_t bit0_loc = 4;
+      uint8_t bit1_loc = 5;
       writeI2C(_R_PWM, pwm, 1);
       break;
     case 3:
-      bit0_loc = 6;
-      bit1_loc = 7;
+      uint8_t bit0_loc = 6;
+      uint8_t bit1_loc = 7;
       writeI2C(_W_PWM, pwm, 1);
       break;
     default:
       return 0;
   }
-  safeSet2Bits(_LED_MAP, 0, 0, bit1_loc, bit0_loc)
+  
 }
 
 
@@ -67,24 +65,24 @@ void LP5562::programEngine(uint8_t eng, uint16_t* program)
   {
     case 0:
       uint16_t* engine = _ENG1;
-      bit0_loc = 4;
-      bit1_loc = 5;
+      uint8_t bit0_loc = 4;
+      uint8_t bit1_loc = 5;
       break;
     case 1:
       uint16_t* engine = _ENG2;
-      bit0_loc = 2;
-      bit1_loc = 3;
+      uint8_t bit0_loc = 2;
+      uint8_t bit1_loc = 3;
       break;
     case 2:
       uint16_t* engine = _ENG3;
-      bit0_loc = 0;
-      bit1_loc = 1;
+      uint8_t bit0_loc = 0;
+      uint8_t bit1_loc = 1;
       break;
     default:
       return 0;
   }
   // Disable power save mode
-  disablePowerSave();
+  setPowerSave(0);
   // Find current state of mode register
   uint16_t current_state = readI2C(_OP_MODE, 1);
   // Enforce load program mode to mode register
@@ -102,7 +100,7 @@ void LP5562::programEngine(uint8_t eng, uint16_t* program)
   current_state ^= (-0 ^ current_state) & (1UL << bit1_loc);
   writeI2C(_OP_MODE, current_state, 1);
   // Renable power save mode
-  enablePowerSave();
+  setPowerSave(1);
 }
 
 
@@ -111,16 +109,16 @@ void LP5562:executeEngine(uint8_t eng)
   switch (eng)
   {
     case 0:
-      bit0_loc = 4;
-      bit1_loc = 5;
+      uint8_t bit0_loc = 4;
+      uint8_t bit1_loc = 5;
       break;
     case 1:
-      bit0_loc = 2;
-      bit1_loc = 3;
+      uint8_t bit0_loc = 2;
+      uint8_t bit1_loc = 3;
       break;
     case 2:
-      bit0_loc = 0;
-      bit1_loc = 1;
+      uint8_t bit0_loc = 0;
+      uint8_t bit1_loc = 1;
       break;
     default:
       return 0;
@@ -132,27 +130,52 @@ void LP5562:executeEngine(uint8_t eng)
 }
 
 
+/*
+ * 
+*/
+void LP5562::setLedCtrlMap()
+{
+  safeSet2Bits(_LED_MAP, 0, 0, bit1_loc, bit0_loc)
+}
+
+
+/*
+ * 
+*/
 void LP5562::setPC()
 {
   
 }
 
 
+/*
+ * 
+*/
 void LP5562::deviceReset()
 {
-  
+  writeI2C(_RESET, 0xFF, 1);
 }
 
 
-void LP5562::enablePowerSave()
+/*
+ * Set PWM Switching Frequency. 0 is 256Hz and 1 is 558Hz.
+*/
+void LP5562::setPwmHF(uint8_t state)
 {
-  
+  uint16_t config_state = readI2C(_CONFIG, 1);
+  config_state ^= (-state ^ config_state) & (1UL << 6);
+  writeI2C(_CONFIG, config_state, 1);
 }
 
 
-void LP5562::disbalePowerSave()
+/*
+ * Set power save on or off. Set state to 1 for on and 0 for off.
+*/
+void LP5562::setPowerSave(uint8_t state)
 {
-  
+  uint16_t config_state = readI2C(_CONFIG, 1);
+  config_state ^= (-state ^ config_state) & (1UL << 5);
+  writeI2C(_CONFIG, config_state, 1);
 }
 
 
