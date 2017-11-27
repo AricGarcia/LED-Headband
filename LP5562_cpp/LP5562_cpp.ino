@@ -173,7 +173,7 @@ void LP5562::setPC()
 
 
 /*
- * 
+ * Write all FF to reset register to reset device to defaults.
 */
 void LP5562::deviceReset()
 {
@@ -182,20 +182,37 @@ void LP5562::deviceReset()
 
 
 /*
- * 
+ * Clears an engine interrupt by reading the status register.
 */
 void LP5562::clearInterrupt()
 {
-  
+  readI2C(_STATUS, 1);
 }
 
 
 /*
- * 
+ * Set current between 0-255 translates to 0.0mA-25.5mA in increments of 0.1mA
+ * Color:
+ *  blue:  0
+ *  green: 1
+ *  red:   2
+ *  white: 3
 */
-void LP5562::setCurrent()
+void LP5562::setCurrent(uint8_t color, uint16_t current)
 {
-  
+  switch (color)
+  {
+    case 0:
+      writeI2C(_B_CURRENT, current, 1);
+    case 1:
+      writeI2C(_G_CURRENT, current, 1);
+    case 2:
+      writeI2C(_R_CURRENT, current, 1);
+    case 3:
+      writeI2C(_W_CURRENT, current, 1);
+    default:
+      return 0;
+  }
 }
 
 
@@ -352,7 +369,8 @@ void LP5562::safeSet2Bits(uint16_t reg, uint8_t bit1, uint8_t bit0, uint8_t bit1
 
 using namespace std;
 
-uint16_t rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t increment)
+uint16_t
+rampCMD (uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t increment)
 {
   uint16_t command = 0;
   command |= prescale << 14;
@@ -363,7 +381,8 @@ uint16_t rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t incre
 }
 
 
-uint16_t waitCMD(uint8_t prescale, uint8_t steptime)
+uint16_t
+waitCMD (uint8_t prescale, uint8_t steptime)
 {
   uint16_t command = 0;
   command |= prescale << 14;
@@ -372,7 +391,8 @@ uint16_t waitCMD(uint8_t prescale, uint8_t steptime)
 }
 
 
-uint16_t setPwmCMD(uint8_t pwm)
+uint16_t
+setPwmCMD (uint8_t pwm)
 {
   uint16_t command = 0x4000;
   command |= pwm;
@@ -380,19 +400,38 @@ uint16_t setPwmCMD(uint8_t pwm)
 }
 
 
-int main()
+void
+run_program (uint16_t * prog_start)
 {
-    uint16_t program[5] = {rampCMD(1, 42, 1, 85), 
-    waitCMD(1, 42), 
-    setPwmCMD(160), 
-    rampCMD(1, 42, 0, 85), 
-    waitCMD(0, 42)};
-    
-    for(int i = 0; i<=4; i++)
+  for (int i = 0; i <= 15; i++)
     {
-        cout<<program[i]<<endl;
+      cout << *prog_start << endl;
+      prog_start++;
     }
-    return 0;
+}
+
+
+int
+main ()
+{
+  uint16_t program[16] = {
+    rampCMD (1, 42, 1, 85),
+    waitCMD (1, 42),
+    setPwmCMD (160),
+    rampCMD (1, 42, 0, 85),
+    waitCMD (0, 42),
+    waitCMD (1, 42),
+    setPwmCMD (160),
+    rampCMD (1, 42, 0, 85),
+    waitCMD (1, 42),
+    setPwmCMD (160),
+    rampCMD (1, 42, 0, 85),
+    waitCMD (1, 42),
+    setPwmCMD (160)
+  };
+
+  uint16_t *apple = program;
+  run_program (&apple[0]);
 }
 
 */

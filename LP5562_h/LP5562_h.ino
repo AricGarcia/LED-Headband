@@ -14,7 +14,7 @@ class LP5562
     void executeEngine(uint8_t eng);
     void deviceReset();
     void clearInterrupt(); // still needs cpp
-    void setCurrent(); // still needs cpp
+    void setCurrent();
     void setPwmHF(uint8_t state);
     void setLogOrLin(); // still needs cpp
     uint16_t rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t increment);
