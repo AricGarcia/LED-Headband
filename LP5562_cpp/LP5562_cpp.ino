@@ -44,7 +44,7 @@ void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
       writeI2C(_W_PWM, pwm, 1);
       break;
     default:
-      return 0;
+      continue;
   }
   
 }
@@ -76,7 +76,7 @@ void LP5562::programEngine(uint8_t eng, uint16_t* program)
       uint8_t bit1_loc = 1;
       break;
     default:
-      return 0;
+      continue;
   }
   // Disable power save mode
   setPowerSave(0);
@@ -118,7 +118,7 @@ void LP5562:executeEngine(uint8_t eng)
       uint8_t bit1_loc = 1;
       break;
     default:
-      return 0;
+      continue;
   }
   // Set mode to run
   safeSet2Bits(_OP_MODE, 1, 0, bit1_loc, bit0_loc);
@@ -157,7 +157,7 @@ void LP5562::setLedCtrlMap(uint8_t color, uint8_t ctrl)
       bit1_loc = 7;
       break;
     default:
-      return 0;
+      continue;
   }
   safeSet2Bits(_LED_MAP, (ctrl>>1)&1, ctrl&1, bit1_loc, bit0_loc)
 }
@@ -211,7 +211,7 @@ void LP5562::setCurrent(uint8_t color, uint16_t current)
     case 3:
       writeI2C(_W_CURRENT, current, 1);
     default:
-      return 0;
+      continue;
   }
 }
 
