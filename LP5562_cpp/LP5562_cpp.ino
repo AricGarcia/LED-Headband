@@ -5,9 +5,14 @@
 #include "LP5562.h"
 
 
+/*
+ * Initiate the LP5562. Address options are 0 1 2 or 3. 
+ * This value is dependant on how the addr pins are 
+ * configured when wiring the chip.
+*/
 LP5562::LP5562(int address)
 {
-  _address = address;
+  _address |= address;
   TinyWireM.begin();
   wait(1);
   writeI2C(_ENABLE, 0x40, 1);
@@ -27,23 +32,15 @@ void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
   switch (color)
   {
     case 0:
-      uint8_t bit0_loc = 0;
-      uint8_t bit1_loc = 1;
       writeI2C(_B_PWM, pwm, 1);
       break;
     case 1:
-      uint8_t bit0_loc = 2;
-      uint8_t bit1_loc = 3;
       writeI2C(_G_PWM, pwm, 1);
       break;
     case 2:
-      uint8_t bit0_loc = 4;
-      uint8_t bit1_loc = 5;
       writeI2C(_R_PWM, pwm, 1);
       break;
     case 3:
-      uint8_t bit0_loc = 6;
-      uint8_t bit1_loc = 7;
       writeI2C(_W_PWM, pwm, 1);
       break;
     default:
@@ -130,12 +127,39 @@ void LP5562:executeEngine(uint8_t eng)
 }
 
 
-/*
- * 
-*/
-void LP5562::setLedCtrlMap()
+/* Set control method for each color:
+ *  Color:        Metod:
+ *    blue:  0      I2C:  0
+ *    green: 1      ENG1: 1
+ *    red:   2      ENG2: 2
+ *    white: 3      ENG3: 3
+ */
+void LP5562::setLedCtrlMap(uint8_t color, uint8_t ctrl)
 {
-  safeSet2Bits(_LED_MAP, 0, 0, bit1_loc, bit0_loc)
+  uint8_t bit0_loc;
+  uint8_t bit1_loc;
+  switch (color)
+  {
+    case 0:
+      bit0_loc = 0;
+      bit1_loc = 1;
+      break;
+    case 1:
+      bit0_loc = 2;
+      bit1_loc = 3;
+      break;
+    case 2:
+      bit0_loc = 4;
+      bit1_loc = 5;
+      break;
+    case 3:
+      bit0_loc = 6;
+      bit1_loc = 7;
+      break;
+    default:
+      return 0;
+  }
+  safeSet2Bits(_LED_MAP, (ctrl>>1)&1, ctrl&1, bit1_loc, bit0_loc)
 }
 
 
@@ -158,6 +182,24 @@ void LP5562::deviceReset()
 
 
 /*
+ * 
+*/
+void LP5562::clearInterrupt()
+{
+  
+}
+
+
+/*
+ * 
+*/
+void LP5562::setCurrent()
+{
+  
+}
+
+
+/*
  * Set PWM Switching Frequency. 0 is 256Hz and 1 is 558Hz.
 */
 void LP5562::setPwmHF(uint8_t state)
@@ -165,6 +207,15 @@ void LP5562::setPwmHF(uint8_t state)
   uint16_t config_state = readI2C(_CONFIG, 1);
   config_state ^= (-state ^ config_state) & (1UL << 6);
   writeI2C(_CONFIG, config_state, 1);
+}
+
+
+/*
+ * 
+*/
+void LP5562::setLogOrLin()
+{
+  
 }
 
 
@@ -190,6 +241,10 @@ uint16_t LP5562::rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8
 }
 
 
+/*
+ * prescale: 0 for 0.49ms cycle time, 1 for 15.2ms cycle time
+ * steptime: 
+*/
 int LP5562::waitCMD(uint8_t prescale, uint8_t steptime)
 {
   uint16_t command = 0;
@@ -283,7 +338,7 @@ uint16_t LP5562::readI2C(uint8_t cmd_reg, uint8_t num_bytes)
 }
 
 
-void LP5562::safeSet2Bits(uint8_t reg, uint8_t bit1, uint8_t bit0, uint8_t bit1_loc, uint8_t bit0_loc)
+void LP5562::safeSet2Bits(uint16_t reg, uint8_t bit1, uint8_t bit0, uint8_t bit1_loc, uint8_t bit0_loc)
 {
   uint16_t current_state = readI2C(reg, 1);
   current_state ^= (-bit0 ^ current_state) & (1UL << bit0_loc);

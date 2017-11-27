@@ -8,12 +8,15 @@ class LP5562
     // Public LP5562 functions/variables
     LP5562(int address);
     void setDirectPWM(uint8_t pwm, uint8_t color);
-    void setLedCtrlMap();
-    void setPC();
+    void setLedCtrlMap(uint8_t color, uint8_t ctrl);
+    void setPC(); // still needs cpp
     void programEngine(uint8_t eng, uint16_t* program);
     void executeEngine(uint8_t eng);
     void deviceReset();
+    void clearInterrupt(); // still needs cpp
+    void setCurrent(); // still needs cpp
     void setPwmHF(uint8_t state);
+    void setLogOrLin(); // still needs cpp
     uint16_t rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t increment);
     uint16_t waitCMD(uint8_t prescale, uint8_t steptime);
     uint16_t setPwmCMD(uint8_t pwm);
@@ -23,7 +26,7 @@ class LP5562
     uint16_t triggerCMD(uint8_t send_trigger, uint8_t wait_trigger);
   private:
     // I2C functions/variables
-    uint8_t _address;
+    uint8_t _address = 0x30;
     uint8_t _writeI2C(uint8_t cmd_reg, uint16_t data, uint8_t num_bytes);
     uint16_t _readI2C(uint8_t cmd_reg, uint8_t num_bytes);
     void _safeSet2Bits(uint8_t reg, uint8_t bit1, uint8_t bit0, uint8_t bit1_loc, uint8_t bit0_loc);
