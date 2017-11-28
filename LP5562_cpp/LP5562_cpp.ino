@@ -480,3 +480,33 @@ main ()
 }
 
 */
+
+/*
+
+
+#include <iostream>
+
+using namespace std;
+
+int main()
+{
+    uint8_t num_bytes = 2;
+    uint16_t bytes_to_send = 0x8010;
+    
+    for(uint8_t i=0; i<=8; i+=8)
+    {
+        if(i>=(8*(2-num_bytes)))
+        {
+            uint16_t byte_to_send = bytes_to_send<<i;
+            byte_to_send = byte_to_send>>8;
+            cout<<byte_to_send<<endl;
+        }
+    }
+
+    return 0;
+}
+
+
+
+
+*/
