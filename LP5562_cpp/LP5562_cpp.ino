@@ -101,6 +101,10 @@ void LP5562::programEngine(uint8_t eng, uint16_t* program)
 }
 
 
+/*  
+ *   executeEngine takes an input of eng from [0:2] which corresponds to 
+ *  [ENG3:ENG1]. puts mode and enable for specified engine to run.
+*/
 void LP5562:executeEngine(uint8_t eng)
 {
   switch (eng)
@@ -159,16 +163,38 @@ void LP5562::setLedCtrlMap(uint8_t color, uint8_t ctrl)
     default:
       continue;
   }
-  safeSet2Bits(_LED_MAP, (ctrl>>1)&1, ctrl&1, bit1_loc, bit0_loc)
+  safeSet2Bits(_LED_MAP, (ctrl>>1)&1, ctrl&1, bit1_loc, bit0_loc);
 }
 
 
 /*
  * 
 */
-void LP5562::setPC()
+void LP5562::setPC(uint8_t eng, uint8_t pc)
 {
-  
+  switch (eng)
+  {
+    case 0:
+      uint8_t bit0_loc = 4;
+      uint8_t bit1_loc = 5;
+      uint8_t engine = _ENG3_PC;
+      break;
+    case 1:
+      uint8_t bit0_loc = 2;
+      uint8_t bit1_loc = 3;
+      uint8_t engine = _ENG2_PC;
+      break;
+    case 2:
+      uint8_t bit0_loc = 0;
+      uint8_t bit1_loc = 1;
+      uint8_t engine = _ENG1_PC;
+      break;
+    default:
+      continue;
+  }
+  safeSet2Bits(_ENABLE, 0, 0, bit1_loc, bit0_loc);
+  safeSet2Bits(_OP_MODE, 0, 0, bit1_loc, bit0_loc);
+  writeI2C(engine, pc, 1);
 }
 
 

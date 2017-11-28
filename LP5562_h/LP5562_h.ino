@@ -9,12 +9,12 @@ class LP5562
     LP5562(int address);
     void setDirectPWM(uint8_t pwm, uint8_t color);
     void setLedCtrlMap(uint8_t color, uint8_t ctrl);
-    void setPC(); // still needs cpp
-    void programEngine(uint8_t eng, uint16_t* program);
+    void setPC(uint8_t eng, uint8_t pc);
+    void programEngine(uint8_t eng, uint16_t* program); // need to set enable to hold before setting load
     void executeEngine(uint8_t eng);
     void deviceReset();
     void clearInterrupt(); // still needs cpp
-    void setCurrent();
+    void setCurrent(uint8_t color, uint16_t current);
     void setPwmHF(uint8_t state);
     void setLogOrLin(); // still needs cpp
     uint16_t rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t increment);
