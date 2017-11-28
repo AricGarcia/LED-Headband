@@ -51,7 +51,7 @@ void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
 
 
 /*  
- *   programEngine takes an input of eng from [0:2] which corresponds to 
+ *  programEngine takes an input of eng from [0:2] which corresponds to 
  *  [ENG3:ENG1]. program is defined as the pointer of the first command 
  *  to be programmed to the engine.
 */
@@ -78,6 +78,8 @@ void LP5562::programEngine(uint8_t eng, uint16_t* program)
     default:
       continue;
   }
+  // set enable to hold
+  safeSet2Bits(_ENABLE, 0, 0, bit1_loc, bit0_loc);
   // Disable power save mode
   setPowerSave(0);
   // Find current state of mode register
@@ -168,7 +170,9 @@ void LP5562::setLedCtrlMap(uint8_t color, uint8_t ctrl)
 
 
 /*
- * 
+ * setPC takes an input of eng from [0:2] which corresponds to 
+ * [ENG3:ENG1]. pc is on range of [0:15]. first sets enable to 
+ * hold then sets mode to disabled, then sets pc.
 */
 void LP5562::setPC(uint8_t eng, uint8_t pc)
 {
@@ -254,11 +258,14 @@ void LP5562::setPwmHF(uint8_t state)
 
 
 /*
- * 
+ * Logarithmic: 1
+ * Linear: 0
 */
-void LP5562::setLogOrLin()
+void LP5562::setLogOrLin(uint8_t log_enable)
 {
-  
+  uint16_t enable_state = readI2C(_ENABLE, 1);
+  enable_state ^= (-log_enable ^ enable_state) & (1UL << 7);
+  writeI2C(_ENABLE, enable_state, 1);
 }
 
 
@@ -273,6 +280,12 @@ void LP5562::setPowerSave(uint8_t state)
 }
 
 
+/*
+ * prescale: 0 for 0.49ms cycle time, 1 for 15.2ms cycle time
+ * steptime: [1:63]. Total step time is steptime*prescale factor
+ * sign: 0 for increase, 1 for decrease
+ * increment: [1:127] total ramp time is increment*steptime*prescale factor
+*/
 uint16_t LP5562::rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t increment)
 {
   uint16_t command = 0;
@@ -286,7 +299,7 @@ uint16_t LP5562::rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8
 
 /*
  * prescale: 0 for 0.49ms cycle time, 1 for 15.2ms cycle time
- * steptime: 
+ * steptime: [1:63]. Total wait time is steptime*prescale factor
 */
 int LP5562::waitCMD(uint8_t prescale, uint8_t steptime)
 {
@@ -297,6 +310,9 @@ int LP5562::waitCMD(uint8_t prescale, uint8_t steptime)
 }
 
 
+/*
+ * pwm is on the range of [0:255]
+*/
 int LP5562::setPwmCMD(uint8_t pwm)
 {
   uint16_t command = 0x4000;
@@ -305,6 +321,9 @@ int LP5562::setPwmCMD(uint8_t pwm)
 }
 
 
+/*
+ * command is all 0, sets pc back to 0.
+*/
 int LP5562::goToStartCMD()
 {
   uint16_t command = 0;
