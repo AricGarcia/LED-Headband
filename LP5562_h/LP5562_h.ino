@@ -18,9 +18,9 @@ class LP5562
     void setPwmHF(uint8_t state);
     void setLogOrLin(uint8_t log_enable);
     uint16_t rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8_t increment);
-    uint16_t waitCMD(uint8_t prescale, uint8_t steptime);
+    uint16_t waitCMD(uint8_t prescale, uint8_t waittime);
     uint16_t setPwmCMD(uint8_t pwm);
-    uint16_t goToStartCMD();
+    uint16_t go2StartCMD();
     uint16_t branchCMD(uint8_t loop_cnt, uint8_t step_num);
     uint16_t endCMD(uint8_t send_interupt, uint8_t reset);
     uint16_t triggerCMD(uint8_t send_trigger, uint8_t wait_trigger);

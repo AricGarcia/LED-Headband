@@ -21,12 +21,13 @@ LP5562::LP5562(int address)
 }
 
 
-/* Set PWM direct input from AVR from 0-255 duty cycle. Color is as follows:
-   blue:  0
-   green: 1
-   red:   2
-   white: 3
-   */
+/* 
+ *  Set PWM direct input from AVR from 0-255 duty cycle. Color is as follows:
+ *  blue:  0
+ *  green: 1
+ *  red:   2
+ *  white: 3
+ */
 void LP5562::SetDirectPwm(uint8_t pwm, uint8_t color)
 {
   switch (color)
@@ -105,7 +106,7 @@ void LP5562::programEngine(uint8_t eng, uint16_t* program)
 
 /*  
  *   executeEngine takes an input of eng from [0:2] which corresponds to 
- *  [ENG3:ENG1]. puts mode and enable for specified engine to run.
+ *   [ENG3:ENG1]. puts mode and enable for specified engine to run.
 */
 void LP5562:executeEngine(uint8_t eng)
 {
@@ -133,7 +134,8 @@ void LP5562:executeEngine(uint8_t eng)
 }
 
 
-/* Set control method for each color:
+/* 
+ *  Set control method for each color:
  *  Color:        Metod:
  *    blue:  0      I2C:  0
  *    green: 1      ENG1: 1
@@ -169,10 +171,10 @@ void LP5562::setLedCtrlMap(uint8_t color, uint8_t ctrl)
 }
 
 
-/*
- * setPC takes an input of eng from [0:2] which corresponds to 
- * [ENG3:ENG1]. pc is on range of [0:15]. first sets enable to 
- * hold then sets mode to disabled, then sets pc.
+/* 
+ *  setPC takes an input of eng from [0:2] which corresponds to 
+ *  [ENG3:ENG1]. pc is on range of [0:15]. first sets enable to 
+ *  hold then sets mode to disabled, then sets pc.
 */
 void LP5562::setPC(uint8_t eng, uint8_t pc)
 {
@@ -281,6 +283,7 @@ void LP5562::setPowerSave(uint8_t state)
 
 
 /*
+ * Build a Ramp Command!
  * prescale: 0 for 0.49ms cycle time, 1 for 15.2ms cycle time
  * steptime: [1:63]. Total step time is steptime*prescale factor
  * sign: 0 for increase, 1 for decrease
@@ -298,19 +301,21 @@ uint16_t LP5562::rampCMD(uint8_t prescale, uint8_t steptime, uint8_t sign, uint8
 
 
 /*
+ * Build a Wait Command!
  * prescale: 0 for 0.49ms cycle time, 1 for 15.2ms cycle time
- * steptime: [1:63]. Total wait time is steptime*prescale factor
+ * waittime: [1:63]. Total wait time is steptime*prescale factor
 */
-int LP5562::waitCMD(uint8_t prescale, uint8_t steptime)
+int LP5562::waitCMD(uint8_t prescale, uint8_t waittime)
 {
   uint16_t command = 0;
   command |= prescale << 14;
-  command |= steptime << 8;
+  command |= waittime << 8;
   return command;
 }
 
 
 /*
+ * Build a PWM Command!
  * pwm is on the range of [0:255]
 */
 int LP5562::setPwmCMD(uint8_t pwm)
@@ -322,15 +327,21 @@ int LP5562::setPwmCMD(uint8_t pwm)
 
 
 /*
+ * Build a Go to Start Command!
  * command is all 0, sets pc back to 0.
 */
-int LP5562::goToStartCMD()
+int LP5562::go2StartCMD()
 {
   uint16_t command = 0;
   return command;
 }
 
 
+/*
+ * Build a Branch Command!
+ * loop_cnt = [0:63] 0 means infinite looping
+ * step_num = [0:15] step number where loop returns each pass through
+*/
 int LP5562::branchCMD(uint8_t loop_cnt, uint8_t step_num)
 {
   uint16_t command = 0xA000;
@@ -340,6 +351,11 @@ int LP5562::branchCMD(uint8_t loop_cnt, uint8_t step_num)
 }
 
 
+/*
+ * Build an End Command!
+ * send_interupt = [0:1]. 0 means no interrupt is sent. 1 means interrupt is sent.
+ * reset = [0:1]. 0 is keep current PWM value. 1 is set PWM value to 0.
+*/
 int LP5562::endCMD(uint8_t send_interupt, uint8_t reset)
 {
   uint16_t command = 0xC000;
@@ -349,6 +365,12 @@ int LP5562::endCMD(uint8_t send_interupt, uint8_t reset)
 }
 
 
+/*
+ * Build a Trigger Command!
+ * send_trigger: [0:7] 
+ * wait_trigger: [0:7]
+ * gonna need a description and example here...
+*/
 int LP5562::triggerCMD(uint8_t send_trigger, uint8_t wait_trigger)
 {
   uint16_t command = 0xE000;
