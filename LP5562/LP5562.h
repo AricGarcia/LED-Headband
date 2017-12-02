@@ -1,7 +1,7 @@
 #ifndef LP5562_h
 #define LP5562_h
 
-#include Arduino
+#include "Arduino.h"
 class LP5562
 {
   public:
