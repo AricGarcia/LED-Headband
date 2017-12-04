@@ -7,7 +7,7 @@ class LP5562
   public:
     // Public LP5562 functions/variables
     LP5562(int address);
-    void setDirectPWM(uint8_t pwm, uint8_t color);
+    void setDirectPwm(uint8_t pwm, uint8_t color);
     void setLedCtrlMap(uint8_t color, uint8_t ctrl);
     void setPC(uint8_t eng, uint8_t pc);
     void programEngine(uint8_t eng, uint16_t* program);
@@ -27,12 +27,12 @@ class LP5562
   private:
     // I2C functions/variables
     uint8_t _address = 0x30;
-    uint8_t _writeI2C(uint8_t cmd_reg, uint16_t data, uint8_t num_bytes);
-    uint16_t _readI2C(uint8_t cmd_reg, uint8_t num_bytes);
-    void _safeSet2Bits(uint8_t reg, uint8_t bit1, uint8_t bit0, uint8_t bit1_loc, uint8_t bit0_loc);
+    uint8_t writeI2C(uint8_t cmd_reg, uint16_t data, uint8_t num_bytes);
+    uint16_t readI2C(uint8_t cmd_reg, uint8_t num_bytes);
+    void safeSet2Bits(uint8_t reg, uint8_t bit1, uint8_t bit0, uint8_t bit1_loc, uint8_t bit0_loc);
     
     // Private LP5562 functions/variables
-    void _setPowerSave(uint8_t state);
+    void setPowerSave(uint8_t state);
 
     uint8_t _ENABLE = 0x00;
     uint8_t _OP_MODE = 0x01;
