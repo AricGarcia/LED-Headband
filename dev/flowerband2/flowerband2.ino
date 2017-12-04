@@ -12,7 +12,7 @@ LP5562 lp5562(0);
 
 void setup() {
   // put your setup code here, to run once:
-
+  LP5562.setDirectPwm();
 }
 
 void loop() {
