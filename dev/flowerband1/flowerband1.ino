@@ -36,10 +36,10 @@ int color_pin_array[ 4 ] = {RED_PIN, BLUE_PIN, GREEN_PIN, WWHITE_PIN};
 
 //Supporting Functions
 void power_off(){
-    digitalWrite(RED_PIN, LOW);
-    digitalWrite(GREEN_PIN, LOW);
-    digitalWrite(BLUE_PIN, LOW);
-    digitalWrite(WWHITE_PIN, LOW);
+    digitalWrite(RED_PIN, HIGH); // Inverting for OD test
+    digitalWrite(GREEN_PIN, HIGH); // Inverting for OD test
+    digitalWrite(BLUE_PIN, HIGH); // Inverting for OD test
+    digitalWrite(WWHITE_PIN, HIGH); // Inverting for OD test
 }
 
 
@@ -72,12 +72,14 @@ void pwm_bit_bang(int pin, int pwm, int ms_delay){
   else if(pwm <= 0){
     pwm = 1;
   }
-  int t = millis();
-  while((millis() - t) <= ms_delay){
-    digitalWrite(pin, HIGH);
+  unsigned long curr_t = millis();
+  long prev_t = curr_t;
+  while((curr_t - prev_t) <= ms_delay){
+    digitalWrite(pin, LOW); // Inverting for OD test
     delayMicroseconds(pwm);
-    digitalWrite(pin, LOW);
+    digitalWrite(pin, HIGH); // Inverting for OD test
     delayMicroseconds(1000-pwm);
+    curr_t = millis();
   }
 }
 
@@ -110,9 +112,9 @@ void power_on_static(int R_PWM=0, int B_PWM=0, int G_PWM=0, int WW_PWM=0){
 }
 
 
-void power_on_sin(int amplitude_percentage, int period){
-   
-}
+//void power_on_sin(int amplitude_percentage, int period){
+//   
+//}
 
 
 int checkForButtonEvent(int Button_Status, int Led_Mode)
@@ -141,6 +143,7 @@ void setup() {
   for (int i = 0; i <= 3; i++) {
     pinMode(color_pin_array[i], OUTPUT);
   }
+  power_off();
   pinMode(SWITCH, INPUT);
 }
 
@@ -151,11 +154,11 @@ void loop() {
 //  Serial.print("switch_status: ");
 //  Serial.println(switch_status);
   switch(led_mode){
-    case 0:
+    case 1:
       // blue
       power_on_static(0, 100, 0, 0);
       break;
-    case 1:
+    case 0:
       // green
       power_on_static(0, 0, 100, 0);
       break;
@@ -191,9 +194,9 @@ void loop() {
       // purple
       power_on_static(10, 100, 0, 0);
       break;
+//    case 10:
+//      power_on_sin();
     case 10:
-      power_on_sin();
-    case 11:
       power_off();
       break;
       }
